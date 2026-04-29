@@ -37,11 +37,11 @@ function init() {
     return;
   }
 
-  // Basic state (no chrome dependency)
   savedToggleStates = {};
   removedExtensions = [];
 
   renderExtensions(container);
+  setupEvents();
 }
 
 // ------------------------------
@@ -82,5 +82,40 @@ function renderExtensions(container) {
     `;
 
     container.appendChild(card);
+  });
+}
+
+// ------------------------------
+// 5️⃣ EVENTS (SAFE)
+// ------------------------------
+function setupEvents() {
+
+  // Toggle
+  document.addEventListener("change", (e) => {
+    if (e.target.type === "checkbox") {
+      const card = e.target.closest(".mm");
+      if (!card) return;
+
+      const name = card.querySelector(".highlight").innerText.trim();
+      const enabled = e.target.checked;
+
+      card.classList.toggle("active", enabled);
+      savedToggleStates[name] = enabled;
+    }
+  });
+
+  // Remove
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("remove-btn")) {
+      const card = e.target.closest(".mm");
+      if (!card) return;
+
+      const name = card.querySelector(".highlight").innerText.trim();
+
+      // Save removed state
+      removedExtensions.push(name);
+
+      card.remove();
+    }
   });
 }
