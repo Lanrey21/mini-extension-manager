@@ -309,18 +309,26 @@ body.light-mode .head {
   }
 }
 
-
 .mm {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: fadeIn 0.4s ease forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.mm:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.checkbox-con input,
+.slider {
+  transition: all 0.25s ease;
+}
+
+
+.fb, .sb, .tb {
+  transition: transform 0.1s ease;
+}
+
+.fb:active, .sb:active, .tb:active {
+  transform: scale(0.95);
 }
 
 /* --------------------------------------------------
