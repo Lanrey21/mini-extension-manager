@@ -31,6 +31,9 @@ function init() {
   console.log("INIT RUNNING");
 
   const container = document.getElementById("cards-container");
+  const allBtn = document.querySelector(".fb");
+  const activeBtn = document.querySelector(".sb");
+  const inactiveBtn = document.querySelector(".tb");
 
   if (!container) {
     console.error("Container not found");
@@ -42,6 +45,7 @@ function init() {
 
   renderExtensions(container);
   setupEvents();
+  setupFilters(allBtn, activeBtn, inactiveBtn, [allBtn, activeBtn, inactiveBtn]);
 }
 
 // ------------------------------
@@ -86,7 +90,7 @@ function renderExtensions(container) {
 }
 
 // ------------------------------
-// 5️⃣ EVENTS (SAFE)
+// 5️⃣ EVENTS
 // ------------------------------
 function setupEvents() {
 
@@ -111,11 +115,48 @@ function setupEvents() {
       if (!card) return;
 
       const name = card.querySelector(".highlight").innerText.trim();
-
-      // Save removed state
       removedExtensions.push(name);
 
       card.remove();
     }
+  });
+}
+
+// ------------------------------
+// 6️⃣ FILTERS
+// ------------------------------
+function setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons) {
+
+  function setActiveFilter(activeButton) {
+    filterButtons.forEach(btn => btn.classList.remove("active-filter"));
+    activeButton.classList.add("active-filter");
+  }
+
+  function getCards() {
+    return document.querySelectorAll(".mm");
+  }
+
+  // Show all
+  allBtn.addEventListener("click", () => {
+    setActiveFilter(allBtn);
+    getCards().forEach(card => {
+      card.style.display = "grid";
+    });
+  });
+
+  // Show active only
+  activeBtn.addEventListener("click", () => {
+    setActiveFilter(activeBtn);
+    getCards().forEach(card => {
+      card.style.display = card.classList.contains("active") ? "grid" : "none";
+    });
+  });
+
+  // Show inactive only
+  inactiveBtn.addEventListener("click", () => {
+    setActiveFilter(inactiveBtn);
+    getCards().forEach(card => {
+      card.style.display = !card.classList.contains("active") ? "grid" : "none";
+    });
   });
 }
