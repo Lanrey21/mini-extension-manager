@@ -28,32 +28,33 @@ let removedExtensions = [];
 document.addEventListener("DOMContentLoaded", init);
 
 function init() {
-  console.log("INIT RUNNING");
-
   const container = document.getElementById("cards-container");
   const allBtn = document.querySelector(".fb");
   const activeBtn = document.querySelector(".sb");
   const inactiveBtn = document.querySelector(".tb");
+  const themeToggle = document.querySelector(".fim");
 
-  if (!container) {
-    console.error("Container not found");
-    return;
+  if (!container) return;
+
+  // Load from localStorage
+  savedToggleStates = JSON.parse(localStorage.getItem("toggles")) || {};
+  removedExtensions = JSON.parse(localStorage.getItem("removed")) || [];
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "light") {
+    document.body.classList.add("light-mode");
   }
-
-  savedToggleStates = {};
-  removedExtensions = [];
 
   renderExtensions(container);
   setupEvents();
   setupFilters(allBtn, activeBtn, inactiveBtn, [allBtn, activeBtn, inactiveBtn]);
+  setupTheme(themeToggle);
 }
 
 // ------------------------------
 // 4️⃣ RENDER
 // ------------------------------
 function renderExtensions(container) {
-  console.log("Rendering cards...");
-
   container.innerHTML = "";
 
   extensions.forEach(ext => {
@@ -79,7 +80,7 @@ function renderExtensions(container) {
       <img src="${ext.img}" alt="${ext.name}">
       <p>
         <span class="highlight">${ext.name}</span><br>
-        <span class="subtext">Quickly inspect page layout and visualize element boundaries</span>
+        <span class="subtext">Quickly inspect page layout</span>
       </p>
       <button class="remove-btn ${ext.btnClass}">Remove</button>
       ${toggleHTML}
@@ -105,6 +106,8 @@ function setupEvents() {
 
       card.classList.toggle("active", enabled);
       savedToggleStates[name] = enabled;
+
+      localStorage.setItem("toggles", JSON.stringify(savedToggleStates));
     }
   });
 
@@ -115,7 +118,9 @@ function setupEvents() {
       if (!card) return;
 
       const name = card.querySelector(".highlight").innerText.trim();
+
       removedExtensions.push(name);
+      localStorage.setItem("removed", JSON.stringify(removedExtensions));
 
       card.remove();
     }
@@ -136,15 +141,11 @@ function setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons) {
     return document.querySelectorAll(".mm");
   }
 
-  // Show all
   allBtn.addEventListener("click", () => {
     setActiveFilter(allBtn);
-    getCards().forEach(card => {
-      card.style.display = "grid";
-    });
+    getCards().forEach(card => card.style.display = "grid");
   });
 
-  // Show active only
   activeBtn.addEventListener("click", () => {
     setActiveFilter(activeBtn);
     getCards().forEach(card => {
@@ -152,11 +153,24 @@ function setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons) {
     });
   });
 
-  // Show inactive only
   inactiveBtn.addEventListener("click", () => {
     setActiveFilter(inactiveBtn);
     getCards().forEach(card => {
       card.style.display = !card.classList.contains("active") ? "grid" : "none";
     });
+  });
+}
+
+// ------------------------------
+// 7️⃣ THEME TOGGLE
+// ------------------------------
+function setupTheme(toggleBtn) {
+  if (!toggleBtn) return;
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+
+    const isLight = document.body.classList.contains("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
   });
 }
