@@ -60,6 +60,19 @@ function init() {
   setupTheme(themeToggle);
 
   applyActiveExtensions();
+
+  const resetBtn = document.getElementById("reset-btn");
+
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    const confirmReset = confirm("Reset all extensions?");
+
+    if (!confirmReset) return;
+
+    localStorage.clear();
+    location.reload();
+  });
+}
 }
 
 // ------------------------------
