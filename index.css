@@ -287,6 +287,41 @@ body.light-mode .head {
   opacity: 0.85;
 }
 
+.mm {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mm:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.mm {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.mm {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* --------------------------------------------------
    CHEAT SHEET / NOTES
