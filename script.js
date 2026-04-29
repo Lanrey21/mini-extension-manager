@@ -17,13 +17,22 @@ const extensions = [
 ];
 
 // ------------------------------
-// 2️⃣ State
+// 2️⃣ Tools (Extension Mapping)
+// ------------------------------
+const tools = {
+  "GridGuides": { action: "gridOverlay" },
+  "LinkChecker": { action: "highlightLinks" },
+  "DOM Snapshot": { action: "domSnapshot" }
+};
+
+// ------------------------------
+// 3️⃣ State
 // ------------------------------
 let savedToggleStates = {};
 let removedExtensions = [];
 
 // ------------------------------
-// 3️⃣ INIT
+// 4️⃣ INIT
 // ------------------------------
 document.addEventListener("DOMContentLoaded", init);
 
@@ -36,7 +45,7 @@ function init() {
 
   if (!container) return;
 
-  // Load from localStorage
+  // Load saved state
   savedToggleStates = JSON.parse(localStorage.getItem("toggles")) || {};
   removedExtensions = JSON.parse(localStorage.getItem("removed")) || [];
   const savedTheme = localStorage.getItem("theme");
@@ -49,10 +58,12 @@ function init() {
   setupEvents();
   setupFilters(allBtn, activeBtn, inactiveBtn, [allBtn, activeBtn, inactiveBtn]);
   setupTheme(themeToggle);
+
+  applyActiveExtensions();
 }
 
 // ------------------------------
-// 4️⃣ RENDER
+// 5️⃣ RENDER
 // ------------------------------
 function renderExtensions(container) {
   container.innerHTML = "";
@@ -91,7 +102,7 @@ function renderExtensions(container) {
 }
 
 // ------------------------------
-// 5️⃣ EVENTS
+// 6️⃣ EVENTS
 // ------------------------------
 function setupEvents() {
 
@@ -108,6 +119,9 @@ function setupEvents() {
       savedToggleStates[name] = enabled;
 
       localStorage.setItem("toggles", JSON.stringify(savedToggleStates));
+
+      // Extension trigger
+      triggerExtensionEffect(name, enabled);
     }
   });
 
@@ -128,7 +142,7 @@ function setupEvents() {
 }
 
 // ------------------------------
-// 6️⃣ FILTERS
+// 7️⃣ FILTERS
 // ------------------------------
 function setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons) {
 
@@ -162,7 +176,7 @@ function setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons) {
 }
 
 // ------------------------------
-// 7️⃣ THEME TOGGLE
+// 8️⃣ THEME
 // ------------------------------
 function setupTheme(toggleBtn) {
   if (!toggleBtn) return;
@@ -172,5 +186,40 @@ function setupTheme(toggleBtn) {
 
     const isLight = document.body.classList.contains("light-mode");
     localStorage.setItem("theme", isLight ? "light" : "dark");
+  });
+}
+
+// ------------------------------
+// 9️⃣ EXTENSION EFFECTS
+// ------------------------------
+async function triggerExtensionEffect(name, enabled) {
+  if (typeof chrome === "undefined" || !chrome.tabs) return;
+
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  });
+
+  if (!tab || !tab.id) return;
+
+  const tool = tools[name];
+  if (!tool) return;
+
+  chrome.tabs.sendMessage(tab.id, {
+    action: tool.action,
+    enabled
+  });
+}
+
+// ------------------------------
+// 🔟 APPLY ACTIVE ON LOAD
+// ------------------------------
+function applyActiveExtensions() {
+  if (typeof chrome === "undefined" || !chrome.tabs) return;
+
+  Object.entries(savedToggleStates).forEach(([name, enabled]) => {
+    if (enabled) {
+      triggerExtensionEffect(name, true);
+    }
   });
 }
