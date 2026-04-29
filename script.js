@@ -19,47 +19,19 @@ function updateBadge() {
 // ------------------------------
 async function init() {
   const container = document.getElementById("cards-container");
-  const allBtn = document.querySelector(".fb");
-  const activeBtn = document.querySelector(".sb");
-  const inactiveBtn = document.querySelector(".tb");
-  const themeToggle = document.querySelector(".fim");
 
-  const filterButtons = [allBtn, activeBtn, inactiveBtn];
-
-  // Load storage
-  let data = {};
-
-  if (typeof chrome !== "undefined" && chrome.storage) {
-    data = await chrome.storage.local.get([
-      TOGGLE_STORAGE_KEY,
-      REMOVED_STORAGE_KEY,
-      THEME_KEY
-    ]);
-  } else {
-    // fallback for web (GitHub Pages)
-    data = {
-      [TOGGLE_STORAGE_KEY]: {},
-      [REMOVED_STORAGE_KEY]: [],
-      [THEME_KEY]: "dark"
-    };
+  if (!container) {
+    console.error("Container not found");
+    return;
   }
 
-  savedToggleStates = data[TOGGLE_STORAGE_KEY] || {};
-  removedExtensions = data[REMOVED_STORAGE_KEY] || [];
-  updateBadge();
+  // Temporary basic state
+  savedToggleStates = {};
+  removedExtensions = [];
 
-  if (data[THEME_KEY] === "light") {
-    document.body.classList.add("light-mode");
-  }
-
+  // Force render only
   renderExtensions(container);
-  setupFilters(allBtn, activeBtn, inactiveBtn, filterButtons);
-  setupTheme(themeToggle);
-  setupEvents();
-
-  applyActiveExtensions();
 }
-
 // ------------------------------
 // 7️⃣ EVENTS (SAFE VERSION)
 // ------------------------------
