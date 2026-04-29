@@ -68,7 +68,7 @@ function init() {
 function renderExtensions(container) {
   container.innerHTML = "";
 
-  extensions.forEach(ext => {
+  extensions.forEach((ext, index) => {
     if (removedExtensions.includes(ext.name)) return;
 
     const isActive = savedToggleStates[ext.name] ?? ext.active;
@@ -96,6 +96,7 @@ function renderExtensions(container) {
       <button class="remove-btn ${ext.btnClass}">Remove</button>
       ${toggleHTML}
     `;
+    card.style.animationDelay = `${index * 0.08}s`;
 
     container.appendChild(card);
   });
