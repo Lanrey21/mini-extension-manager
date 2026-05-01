@@ -58,21 +58,22 @@ function init() {
   setupEvents();
   setupFilters(allBtn, activeBtn, inactiveBtn, [allBtn, activeBtn, inactiveBtn]);
   setupTheme(themeToggle);
-
   applyActiveExtensions();
 
+  // Reset button
   const resetBtn = document.getElementById("reset-btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      const confirmReset = confirm("Reset all extensions?");
+      if (!confirmReset) return;
 
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-    const confirmReset = confirm("Reset all extensions?");
+      localStorage.removeItem("toggles");
+      localStorage.removeItem("removed");
+      localStorage.removeItem("theme");
 
-    if (!confirmReset) return;
-
-    localStorage.clear();
-    location.reload();
-  });
-}
+      location.reload();
+    });
+  }
 }
 
 // ------------------------------
@@ -90,14 +91,15 @@ function renderExtensions(container) {
     card.classList.add("mm");
     if (isActive) card.classList.add("active");
 
+    // ✅ FIXED TOGGLE (ACCESSIBLE)
     const toggleHTML =
       ext.toggle === "switch"
         ? `<label class="switch">
-             <input type="checkbox" ${isActive ? "checked" : ""}>
+             <input type="checkbox" aria-label="Toggle ${ext.name}" ${isActive ? "checked" : ""}>
              <span class="slider"></span>
            </label>`
         : `<div class="checkbox-con">
-             <input type="checkbox" ${isActive ? "checked" : ""}>
+             <input type="checkbox" aria-label="Toggle ${ext.name}" ${isActive ? "checked" : ""}>
            </div>`;
 
     card.innerHTML = `
@@ -106,9 +108,13 @@ function renderExtensions(container) {
         <span class="highlight">${ext.name}</span><br>
         <span class="subtext">Quickly inspect page layout</span>
       </p>
-      <button class="remove-btn ${ext.btnClass}">Remove</button>
+      <button class="remove-btn ${ext.btnClass}" aria-label="Remove ${ext.name}">
+        Remove
+      </button>
       ${toggleHTML}
     `;
+
+    // Stagger animation
     card.style.animationDelay = `${index * 0.08}s`;
 
     container.appendChild(card);
@@ -134,7 +140,6 @@ function setupEvents() {
 
       localStorage.setItem("toggles", JSON.stringify(savedToggleStates));
 
-      // Extension trigger
       triggerExtensionEffect(name, enabled);
     }
   });
